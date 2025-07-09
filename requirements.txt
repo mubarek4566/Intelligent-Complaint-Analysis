@@ -3,3 +3,9 @@ numpy
 nltk
 seaborn
 matplotlib.pyplot
+SentenceTransformer
+faiss
+streamlit
+transformers
+tqdm
+chromadb
