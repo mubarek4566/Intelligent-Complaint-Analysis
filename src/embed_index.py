@@ -62,3 +62,27 @@ def load_chunked_data_and_index(data_path="chunked_with_embeddings.csv", index_p
     embeddings = np.vstack(df['embedding'].values).astype('float32')
     index = faiss.read_index(index_path)
     return df, index
+
+def retrieve_top_k_chunks(question, model, index, chunk_df, k=5):
+    """
+    Retrieves top-k most relevant text chunks for a given question using FAISS.
+    """
+    # Embed the question
+    query_vector = model.encode([question], convert_to_numpy=True).astype("float32")
+
+    # Search in the FAISS index
+    distances, indices = index.search(query_vector, k)
+
+    # Retrieve matching chunks and metadata
+    results = []
+    for i in range(k):
+        idx = indices[0][i]
+        if idx < len(chunk_df):
+            result = {
+                "chunk_id": chunk_df.iloc[idx]["chunk_id"],
+                "complaint_id": chunk_df.iloc[idx]["complaint_id"],
+                "text": chunk_df.iloc[idx]["text"],
+                "score": float(distances[0][i])
+            }
+            results.append(result)
+    return results

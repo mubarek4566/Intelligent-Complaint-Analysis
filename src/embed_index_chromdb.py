@@ -7,6 +7,7 @@ from sentence_transformers import SentenceTransformer
 import chromadb
 from chromadb.config import Settings
 
+
 # Load the embedding model
 def load_model(model_name="all-MiniLM-L6-v2"):
     return SentenceTransformer(model_name)
@@ -84,3 +85,54 @@ def process_and_index(df, model_name="all-MiniLM-L6-v2", chunk_size=500, chunk_o
     add_documents_to_collection(collection, chunk_df, embeddings)
     
     return chunk_df, client, collection
+
+
+def load_chromadb_collection(collection_name="complaint_chunks", persist_directory="chromadb_store"):
+    client = chromadb.Client(Settings(
+        chroma_db_impl="duckdb+parquet",
+        persist_directory=persist_directory
+    ))
+    collection = client.get_collection(name=collection_name)
+    return collection
+
+def load_embedding_model(model_name="all-MiniLM-L6-v2"):
+    return SentenceTransformer(model_name)
+
+def retrieve_similar_chunks(query, model, collection, top_k=5):
+    # Step 1: Embed the query
+    query_embedding = model.encode(query).tolist()
+
+    # Step 2: Query ChromaDB
+    results = collection.query(
+        query_embeddings=[query_embedding],
+        n_results=top_k,
+        include=["documents", "metadatas", "distances"]
+    )
+
+    # Step 3: Return results
+    return results
+
+# notebooks/main.ipynb
+
+import sys
+import os
+sys.path.append(os.path.abspath(os.path.join("..", "src")))
+
+from rag_pipeline import retrieve_similar_chunks, load_embedding_model, load_chromadb_collection
+
+# Load the same model and collection used in Task 2
+model = load_embedding_model()
+collection = load_chromadb_collection()
+
+# Sample user question
+user_question = "How can I dispute an unauthorized transaction on my card?"
+
+# Retrieve top 5 relevant complaint chunks
+results = retrieve_similar_chunks(user_question, model, collection, top_k=5)
+
+# Display results
+for i, (doc, meta, score) in enumerate(zip(results["documents"][0], results["metadatas"][0], results["distances"][0])):
+    print(f"\nRank {i+1}:")
+    print(f"Complaint ID: {meta['complaint_id']}")
+    print(f"Score (L2 Distance): {score:.4f}")
+    print(f"Text: {doc}")
