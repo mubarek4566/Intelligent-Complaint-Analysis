@@ -20,7 +20,6 @@ def build_prompt(context_chunks, user_question):
     )
     return prompt
 
-
 def load_local_llm(model_name="facebook/opt-1.3b", device_map="auto", offload_folder="./offload"):
     tokenizer = AutoTokenizer.from_pretrained(model_name)
     model = AutoModelForCausalLM.from_pretrained(
