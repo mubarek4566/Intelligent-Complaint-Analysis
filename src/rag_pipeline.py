@@ -21,17 +21,17 @@ def build_prompt(context_chunks, user_question):
     return prompt
 
 
-def load_local_llm1(model_name="facebook/opt-1.3b", device_map="auto", offload_folder="./offload"):
-    from transformers import AutoTokenizer, AutoModelForCausalLM, pipeline
-
+def load_local_llm(model_name="facebook/opt-1.3b", device_map="auto", offload_folder="./offload"):
     tokenizer = AutoTokenizer.from_pretrained(model_name)
     model = AutoModelForCausalLM.from_pretrained(
         model_name,
-        device_map=device_map,
+        device_map=device_map,            # "auto" or "cpu"
         offload_folder=offload_folder,
         trust_remote_code=True
     )
-    return pipeline("text-generation", model=model, tokenizer=tokenizer)
+    # Use CPU if no GPU is detected
+    device = 0 if device_map == "cuda" else -1
+    return pipeline("text-generation", model=model, tokenizer=tokenizer, device=device)
 
 def generate_answer(context_chunks, user_question, llm_pipeline, max_tokens=300):
     """
