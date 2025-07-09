@@ -1,11 +1,16 @@
-# src/embed_index.py
-
+# import libraries
 import pandas as pd
 import numpy as np
 from tqdm import tqdm
 from sentence_transformers import SentenceTransformer
 import chromadb
 from chromadb.config import Settings
+
+import sys
+import os
+sys.path.append(os.path.abspath(os.path.join("..", "src")))
+
+from rag_pipeline import retrieve_similar_chunks, load_embedding_model, load_chromadb_collection
 
 
 # Load the embedding model
@@ -111,14 +116,6 @@ def retrieve_similar_chunks(query, model, collection, top_k=5):
 
     # Step 3: Return results
     return results
-
-# notebooks/main.ipynb
-
-import sys
-import os
-sys.path.append(os.path.abspath(os.path.join("..", "src")))
-
-from rag_pipeline import retrieve_similar_chunks, load_embedding_model, load_chromadb_collection
 
 # Load the same model and collection used in Task 2
 model = load_embedding_model()
