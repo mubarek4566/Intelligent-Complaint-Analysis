@@ -29,6 +29,12 @@ The system empowers internal teams—Product, Support, Compliance, and Executive
 
 ● Real-time analysis across product categories
 
+● Semantic search over complaint chunks
+
+● Retrieve top relevant complaint texts based on user queries
+
+● Generate natural-language answers using a local LLM (e.g., facebook/opt-1.3b)
+
 ● Dashboard or chatbot interface for internal users
 
 ## 📊 Project Goals & KPIs
@@ -48,3 +54,15 @@ The system empowers internal teams—Product, Support, Compliance, and Executive
 ● Streamlit (for UI) or Chatbot integration (e.g., Rasa, Gradio)
 
 ● Pandas, spaCy, scikit-learn (for preprocessing and analytics)
+
+● SentenceTransformers for embedding complaint texts
+
+● FAISS for fast similarity search
+
+● transformers (LLM) for generating context-aware answers
+
+🧠 LLM Pipeline:
+
+Embeddings generated using "all-MiniLM-L6-v2"
+
+Local language model used for answer generation (can be swapped for API-based or smaller models)
